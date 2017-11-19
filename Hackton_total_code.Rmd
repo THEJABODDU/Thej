@@ -1,0 +1,196 @@
+---
+title : "17125760041_Assignment_3"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+DSC402 ASSIGNMENT 3 HACKATHON - PHASE I PROBLEM: DEVELOP A CLASSIFICATION MODEL THAT WILL IDENTIFY THE COMPENSATION LEVEL OF AN INDIVIDUAL. STEPS
+
+Develop the classification models Decision Tree / kNN / Naïve Bayes
+
+1. Attached is a 'sample data' and below are the features of the data. Review the sample data (Model_Data_sample.csv) and the description below. Build an understanding of the data and plan your approach to build a model
+
+2. Define your data exploration, imputation and visualization approach. (1 Mark)
+
+3. You will be sent the complete data file for modeling. (Model_Data.csv)
+
+4. Set seed for sampling (your roll number) Eg. Set.seed(17125760345)
+
+5. Split model data into train (80%) and test (20%)
+
+6. Build 3 Models, each using one of different type of algorithm. Send me the model building command. (1 mark each + 1 for creative "DS" think = total 4 marks)
+model1 = 
+model2 =
+model3 =
+
+7. Predict your model performance on each of the 3 models and submit ( 1 mark each = total 3 marks)
+model1_accuracy= 79.9
+model2_accuracy = 83.3
+modell3_accuracy= 79.23
+
+8. Generalization ( 1 mark)
+
+9. Upload details into your account on GIT Hub ( 1 mark)
+
+
+#---NAVIEs BAYES--------
+
+```{r}
+hackton <- read.csv(file = "D:/Data Science 2017/Manipal Academy of Data Science/MGADS TERM2/1 Machine Learning/Hackton/Model_Data.csv")
+hackton
+```
+```{r}
+library(class)
+library(tree)
+library(e1071)
+library(VIM)
+library(missForest)
+library(datasets)
+library(data.table)
+```
+
+```{r}
+set.seed(41)
+sample1 <- sample.int(n=nrow(hackton),size = floor(.8*nrow(hackton)),replace = F)
+sample1
+```
+
+
+```{r}
+hck_train <- hackton[sample1,]
+hck_test <- hackton[-sample1,]
+hck_train
+hck_test
+hck_train$salary = as.factor(hck_train$salary)
+```
+
+```{r}
+hck_model_n<- naiveBayes(salary ~ age + workclass+ education+ maritalstatus+ occupation+ relationship + race + sex+ hourperweek+ nativecountry, data = hck_train)
+hck_model_n
+```
+
+```{r}
+hck_model_n<- predict(hck_model_n,hck_test[,-1])
+hck_model_n
+```
+
+```{r}
+confmat_hck <- table(hck_model_n,hck_test$salary)
+confmat_hck
+```
+
+```{r}
+accuracy_n = sum(diag(confmat_hck))/sum(confmat_hck)
+accuracy_n
+```
+
+#-----DECISION TREE---------
+
+```{r}
+hackton <- read.csv(file = "D:/Data Science 2017/Manipal Academy of Data Science/MGADS TERM2/1 Machine Learning/Hackton/Model_Data.csv")
+hackton
+```
+
+```{r}
+set.seed(41)
+sample1 <- sample.int(n=nrow(hackton),size = floor(.8*nrow(hackton)),replace = F)
+sample1
+```
+
+```{r}
+hck_train <- hackton[sample1,]
+hck_test <- hackton[-sample1,]
+hck_train
+hck_test
+```
+
+```{r}
+hck_model_d<- tree(salary ~ age + workclass+ education+ maritalstatus+ occupation + race + sex + hourperweek, data = hck_train)
+hck_model_d
+hck_pred <- predict(hck_model_d,hck_test)
+hck_pred
+```
+```{r}
+maxid99 <- function(arr){
+  return(which(arr==max(arr)))
+}
+maxid99
+```
+
+```{r}
+idx99 <- apply(hck_pred,c(1),maxid99)
+idx99
+```
+```{r}
+hck_model_pr <- c(0,1)[idx99]
+hck_model_pr
+```
+
+```{r}
+hck_comf <- table(hck_model_pr,hck_test$salary)
+hck_comf
+hck_acc_d <- sum(diag(hck_comf))/sum(hck_comf)
+hck_acc_d
+```
+
+
+#-----KNN-----=
+```{r}
+hackton <- read.csv(file = "D:/Data Science 2017/Manipal Academy of Data Science/MGADS TERM2/1 Machine Learning/Hackton/Model_Data.csv")
+hackton
+```
+
+```{r}
+for(i in 1:ncol(hackton)){
+  hackton[,i]=as.numeric(hackton[,i])
+}
+```
+
+```{r}
+set.seed(41)
+sample1 <- sample.int(n=nrow(hackton),size = floor(.8*nrow(hackton)),replace = F)
+sample1
+```
+
+```{r}
+hck_train <- hackton[sample1,]
+hck_test <- hackton[-sample1,]
+hck_train
+hck_test
+hck_train_data <- hck_train[,c(1:14)]
+hck_test_data <- hck_test[,c(1:14)]
+
+hck_train_label <- hck_train[,15]
+
+hck_test_label <- hck_test[,15]
+
+hck_train_label
+hck_test_label
+hck_train$salary = as.factor(hck_train$salary)
+```
+```{r}
+k=9
+```
+
+```{r}
+hck_pre_label <- knn(train = hck_train,test = hck_test, cl = hck_train_label,k)
+hck_pre_label
+```
+
+```{r}
+
+confmat_k = table(hck_test_label,hck_pre_label)
+confmat_k
+```
+
+```{r}
+
+accuracy_k <- sum(diag(confmat_k))/sum(confmat_k)
+accuracy_k
+```
+
+
+
